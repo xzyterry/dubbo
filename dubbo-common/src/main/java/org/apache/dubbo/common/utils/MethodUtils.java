@@ -39,6 +39,7 @@ public class MethodUtils {
      * 访问权限为public
      * 方法参数列表size = 0
      *
+     * 
      */
     public static boolean isGetter(Method method) {
         String name = method.getName();
