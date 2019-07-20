@@ -29,6 +29,17 @@ public class MethodUtils {
                 && ClassUtils.isPrimitive(method.getParameterTypes()[0]);
     }
 
+    //判断是否是get or is方法
+
+    /**
+     * get is 开头
+     * 不等于 get is
+     * getClass getObject
+     *
+     * 访问权限为public
+     * 方法参数列表size = 0
+     *
+     */
     public static boolean isGetter(Method method) {
         String name = method.getName();
         return (name.startsWith("get") || name.startsWith("is"))

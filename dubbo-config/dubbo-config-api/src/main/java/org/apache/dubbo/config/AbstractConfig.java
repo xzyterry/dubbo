@@ -57,55 +57,66 @@ public abstract class AbstractConfig implements Serializable {
     private static final long serialVersionUID = 4267533505537413570L;
 
     /**
+     * 参数的最大长度
      * The maximum length of a <b>parameter's value</b>
      */
     private static final int MAX_LENGTH = 200;
 
     /**
+     * 路径的最大长度
      * The maximum length of a <b>path</b>
      */
     private static final int MAX_PATH_LENGTH = 200;
 
     /**
+     * 名称的匹配规则
      * The rule qualification for <b>name</b>
      */
     private static final Pattern PATTERN_NAME = Pattern.compile("[\\-._0-9a-zA-Z]+");
 
     /**
+     * 多名称的匹配规则
      * The rule qualification for <b>multiply name</b>
      */
     private static final Pattern PATTERN_MULTI_NAME = Pattern.compile("[,\\-._0-9a-zA-Z]+");
 
     /**
+     * 方法名的匹配规则
      * The rule qualification for <b>method names</b>
      */
     private static final Pattern PATTERN_METHOD_NAME = Pattern.compile("[a-zA-Z][0-9a-zA-Z]*");
 
     /**
+     * 路径的匹配模式
      * The rule qualification for <b>path</b>
      */
     private static final Pattern PATTERN_PATH = Pattern.compile("[/\\-$._0-9a-zA-Z]+");
 
     /**
+     * 带特征值匹配模式
      * The pattern matches a value who has a symbol
      */
     private static final Pattern PATTERN_NAME_HAS_SYMBOL = Pattern.compile("[:*,\\s/\\-._0-9a-zA-Z]+");
 
     /**
+     * 匹配一个属性主键
      * The pattern matches a property key
      */
     private static final Pattern PATTERN_KEY = Pattern.compile("[*,\\-._0-9a-zA-Z]+");
 
     /**
+     * 传统的属性容器
      * The legacy properties container
      */
     private static final Map<String, String> LEGACY_PROPERTIES = new HashMap<String, String>();
 
     /**
+     * 后缀容器
      * The suffix container
      */
     private static final String[] SUFFIXES = new String[]{"Config", "Bean"};
 
+    //初始化
     static {
         LEGACY_PROPERTIES.put("dubbo.protocol.name", "dubbo.service.protocol");
         LEGACY_PROPERTIES.put("dubbo.protocol.host", "dubbo.service.server.host");
@@ -121,11 +132,15 @@ public abstract class AbstractConfig implements Serializable {
     }
 
     /**
+     * 配置的id
      * The config id
      */
     protected String id;
+
+    // 前缀
     protected String prefix;
 
+    // 转换成传统值
     private static String convertLegacyValue(String key, String value) {
         if (value != null && value.length() > 0) {
             if ("dubbo.service.max.retry.providers".equals(key)) {
@@ -157,10 +172,13 @@ public abstract class AbstractConfig implements Serializable {
         if (config == null) {
             return;
         }
+        //获取类所有的方法
         Method[] methods = config.getClass().getMethods();
+        //遍历
         for (Method method : methods) {
             try {
                 String name = method.getName();
+
                 if (MethodUtils.isGetter(method)) {
                     Parameter parameter = method.getAnnotation(Parameter.class);
                     if (method.getReturnType() == Object.class || parameter != null && parameter.excluded()) {
