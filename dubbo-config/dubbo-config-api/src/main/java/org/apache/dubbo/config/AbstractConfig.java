@@ -172,30 +172,40 @@ public abstract class AbstractConfig implements Serializable {
         if (config == null) {
             return;
         }
-        //获取类所有的方法
+        // 获取类所有的方法
         Method[] methods = config.getClass().getMethods();
-        //遍历
+        // 遍历
         for (Method method : methods) {
             try {
                 String name = method.getName();
 
                 if (MethodUtils.isGetter(method)) {
+                    // 获取Parameter方法的注解
                     Parameter parameter = method.getAnnotation(Parameter.class);
+                    // 如果方法返回类型是Object,或者注解不为空时过滤注解
                     if (method.getReturnType() == Object.class || parameter != null && parameter.excluded()) {
                         continue;
                     }
                     String key;
+
+
                     if (parameter != null && parameter.key().length() > 0) {
                         key = parameter.key();
                     } else {
+                        // 驼峰 分解 属性 getIncomeRatio -> income.ratio
                         key = calculatePropertyFromGetter(name);
                     }
+
+                    // 获取value
                     Object value = method.invoke(config);
                     String str = String.valueOf(value).trim();
                     if (value != null && str.length() > 0) {
+                        // escaped 类型需要url转换
                         if (parameter != null && parameter.escaped()) {
                             str = URL.encode(str);
                         }
+
+                        // append
                         if (parameter != null && parameter.append()) {
                             String pre = parameters.get(DEFAULT_KEY + "." + key);
                             if (pre != null && pre.length() > 0) {

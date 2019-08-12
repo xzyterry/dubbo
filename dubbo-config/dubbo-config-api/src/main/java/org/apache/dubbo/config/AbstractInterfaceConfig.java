@@ -191,10 +191,14 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
 
     /**
      * Check whether the registry config is exists, and then conversion it to {@link RegistryConfig}
+     * 校验是否注册配置存在,转换成RegistryConfig
      */
     protected void checkRegistry() {
+
+        // 向后兼容性加载配置
         loadRegistriesFromBackwardConfig();
 
+        // 转换注册Id
         convertRegistryIdsToRegistries();
 
         for (RegistryConfig registryConfig : registries) {
@@ -543,14 +547,18 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
         }
     }
 
+    // ids->RegisterConfigs
     private void convertRegistryIdsToRegistries() {
+        // 注册配置为空
         if (StringUtils.isEmpty(registryIds) && CollectionUtils.isEmpty(registries)) {
             Set<String> configedRegistries = new HashSet<>();
+            // 从环境变量中获取扩展配置
             configedRegistries.addAll(getSubProperties(Environment.getInstance().getExternalConfigurationMap(),
                     REGISTRIES_SUFFIX));
             configedRegistries.addAll(getSubProperties(Environment.getInstance().getAppExternalConfigurationMap(),
                     REGISTRIES_SUFFIX));
 
+            // ,分割 注册配置
             registryIds = String.join(COMMA_SEPARATOR, configedRegistries);
         }
 
@@ -590,10 +598,12 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
 
     }
 
+    // 从向后配置中加载注册配置
     private void loadRegistriesFromBackwardConfig() {
-        // for backward compatibility
-        // -Ddubbo.registry.address is now deprecated.
+        // for backward compatibility 为了向后兼容性
+        // -Ddubbo.registry.address is now deprecated. 弃用-Ddubbo.registry.address
         if (registries == null || registries.isEmpty()) {
+
             String address = ConfigUtils.getProperty("dubbo.registry.address");
             if (address != null && address.length() > 0) {
                 List<RegistryConfig> tmpRegistries = new ArrayList<RegistryConfig>();

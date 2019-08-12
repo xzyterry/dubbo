@@ -32,10 +32,13 @@ public @interface Parameter {
 
     String key() default "";
 
+    // 必须参数
     boolean required() default false;
 
+    // 排除
     boolean excluded() default false;
 
+    //?
     boolean escaped() default false;
 
     boolean attribute() default false;

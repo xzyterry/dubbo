@@ -32,25 +32,33 @@ public class JVMUtil {
     }
 
     private static String getThreadDumpString(ThreadInfo threadInfo) {
+        // 线程名 id 状态
         StringBuilder sb = new StringBuilder("\"" + threadInfo.getThreadName() + "\"" +
                 " Id=" + threadInfo.getThreadId() + " " +
                 threadInfo.getThreadState());
+
+        // 线程锁名
         if (threadInfo.getLockName() != null) {
             sb.append(" on " + threadInfo.getLockName());
         }
+
+        // 线程拥有者
         if (threadInfo.getLockOwnerName() != null) {
             sb.append(" owned by \"" + threadInfo.getLockOwnerName() +
                     "\" Id=" + threadInfo.getLockOwnerId());
         }
+        // 暂停
         if (threadInfo.isSuspended()) {
             sb.append(" (suspended)");
         }
+        // 本地
         if (threadInfo.isInNative()) {
             sb.append(" (in native)");
         }
         sb.append('\n');
         int i = 0;
 
+        // 栈跟踪
         StackTraceElement[] stackTrace = threadInfo.getStackTrace();
         MonitorInfo[] lockedMonitors = threadInfo.getLockedMonitors();
         for (; i < stackTrace.length && i < 32; i++) {
@@ -58,6 +66,7 @@ public class JVMUtil {
             sb.append("\tat " + ste.toString());
             sb.append('\n');
             if (i == 0 && threadInfo.getLockInfo() != null) {
+                // 获取线程的状态 阻塞 等待 带时间的等待
                 Thread.State ts = threadInfo.getThreadState();
                 switch (ts) {
                     case BLOCKED:
@@ -76,6 +85,7 @@ public class JVMUtil {
                 }
             }
 
+            // 监视器
             for (MonitorInfo mi : lockedMonitors) {
                 if (mi.getLockedStackDepth() == i) {
                     sb.append("\t-  locked " + mi);
@@ -88,6 +98,7 @@ public class JVMUtil {
             sb.append('\n');
         }
 
+        // 同步锁
         LockInfo[] locks = threadInfo.getLockedSynchronizers();
         if (locks.length > 0) {
             sb.append("\n\tNumber of locked synchronizers = " + locks.length);

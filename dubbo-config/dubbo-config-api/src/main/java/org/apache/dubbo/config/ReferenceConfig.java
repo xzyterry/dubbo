@@ -349,31 +349,43 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
 
     @SuppressWarnings({"unchecked", "rawtypes", "deprecation"})
     private T createProxy(Map<String, String> map) {
+        // 通过参数判断是本地还是远程
         if (shouldJvmRefer(map)) {
+            // 本地设置本地url
             URL url = new URL(LOCAL_PROTOCOL, LOCALHOST_VALUE, 0, interfaceClass.getName()).addParameters(map);
+            // 引用接口
             invoker = REF_PROTOCOL.refer(interfaceClass, url);
             if (logger.isInfoEnabled()) {
                 logger.info("Using injvm service " + interfaceClass.getName());
             }
         } else {
-            urls.clear(); // reference retry init will add url to urls, lead to OOM
-            if (url != null && url.length() > 0) { // user specified URL, could be peer-to-peer address, or register center's address.
+            urls.clear(); // reference retry init will add url to urls, lead to OOM 引用重新初始化会添加url到urls中,导致OOM
+
+            // user specified URL, could be peer-to-peer address, or register center's address.
+            // 用特殊的URl,会端到端地址,或者直连注册中心地址
+            if (url != null && url.length() > 0) {
+
+                // 空格*;空格* 正则分割
                 String[] us = SEMICOLON_SPLIT_PATTERN.split(url);
                 if (us != null && us.length > 0) {
                     for (String u : us) {
                         URL url = URL.valueOf(u);
                         if (StringUtils.isEmpty(url.getPath())) {
-                            url = url.setPath(interfaceName);
+                            url = url.setPath(interfaceName);// 设置接口名
                         }
+                        // 注册
                         if (REGISTRY_PROTOCOL.equals(url.getProtocol())) {
                             urls.add(url.addParameterAndEncoded(REFER_KEY, StringUtils.toQueryString(map)));
                         } else {
+
                             urls.add(ClusterUtils.mergeUrl(url, map));
                         }
                     }
                 }
-            } else { // assemble URL from register center's configuration
-                // if protocols not injvm checkRegistry
+            } else {
+                // assemble URL from register center's configuration 先假设URL来自注册中心的配置
+                // if protocols not injvm checkRegistry 如果协议非本地 校验注册
+
                 if (!LOCAL_PROTOCOL.equalsIgnoreCase(getProtocol())){
                     checkRegistry();
                     List<URL> us = loadRegistries(false);
@@ -435,10 +447,11 @@ public class ReferenceConfig<T> extends AbstractReferenceConfig {
 
     /**
      * Figure out should refer the service in the same JVM from configurations. The default behavior is true
-     * 1. if injvm is specified, then use it
-     * 2. then if a url is specified, then assume it's a remote call
-     * 3. otherwise, check scope parameter
-     * 4. if scope is not specified but the target service is provided in the same JVM, then prefer to make the local
+     * 从配置中 分辨出 应该引用相同JVM的服务
+     * 1. if injvm is specified, then use it 如果被指定的是本地,则使用
+     * 2. then if a url is specified, then assume it's a remote call 否则 一个url被指定,然后假设他是一个远程调用
+     * 3. otherwise, check scope parameter 否则校验范围参数
+     * 4. if scope is not specified but the target service is provided in the same JVM, then prefer to make the local 如果范围没有被指定,但是目标服务在相同的JVM被提供,默认的被当做是一个本地调用
      * call, which is the default behavior
      */
     protected boolean shouldJvmRefer(Map<String, String> map) {

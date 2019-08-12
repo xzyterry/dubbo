@@ -110,7 +110,9 @@ public class AbstractConfigTest {
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("default.num", "one");
         parameters.put("num", "ONE");
-        AbstractConfig.appendParameters(parameters, new ParameterConfig(1, "hello/world", 30, "password"), "prefix");
+        AbstractConfig
+                .appendParameters(parameters, new ParameterConfig(1, "hello/world", 30, "password"),
+                        "prefix");
         Assertions.assertEquals("one", parameters.get("prefix.key.1"));
         Assertions.assertEquals("two", parameters.get("prefix.key.2"));
         Assertions.assertEquals("ONE,one,1", parameters.get("prefix.num"));
@@ -138,7 +140,8 @@ public class AbstractConfigTest {
     @Test
     public void testAppendParameters4() throws Exception {
         Map<String, String> parameters = new HashMap<String, String>();
-        AbstractConfig.appendParameters(parameters, new ParameterConfig(1, "hello/world", 30, "password"));
+        AbstractConfig.appendParameters(parameters,
+                new ParameterConfig(1, "hello/world", 30, "password"));
         Assertions.assertEquals("one", parameters.get("key.1"));
         Assertions.assertEquals("two", parameters.get("key.2"));
         Assertions.assertEquals("1", parameters.get("num"));
@@ -149,7 +152,8 @@ public class AbstractConfigTest {
     @Test
     public void testAppendAttributes1() throws Exception {
         Map<String, Object> parameters = new HashMap<String, Object>();
-        AbstractConfig.appendAttributes(parameters, new AttributeConfig('l', true, (byte) 0x01), "prefix");
+        AbstractConfig.appendAttributes(parameters, new AttributeConfig('l', true, (byte) 0x01),
+                "prefix");
         Assertions.assertEquals('l', parameters.get("prefix.let"));
         Assertions.assertEquals(true, parameters.get("prefix.activate"));
         Assertions.assertFalse(parameters.containsKey("prefix.flag"));
@@ -166,17 +170,20 @@ public class AbstractConfigTest {
 
     @Test
     public void checkExtension() throws Exception {
-        Assertions.assertThrows(IllegalStateException.class, () -> AbstractConfig.checkExtension(Greeting.class, "hello", "world"));
+        Assertions.assertThrows(IllegalStateException.class,
+                () -> AbstractConfig.checkExtension(Greeting.class, "hello", "world"));
     }
 
     @Test
     public void checkMultiExtension1() throws Exception {
-        Assertions.assertThrows(IllegalStateException.class, () -> AbstractConfig.checkMultiExtension(Greeting.class, "hello", "default,world"));
+        Assertions.assertThrows(IllegalStateException.class,
+                () -> AbstractConfig.checkMultiExtension(Greeting.class, "hello", "default,world"));
     }
 
     @Test
     public void checkMultiExtension2() throws Exception {
-        Assertions.assertThrows(IllegalStateException.class, () -> AbstractConfig.checkMultiExtension(Greeting.class, "hello", "default,-world"));
+        Assertions.assertThrows(IllegalStateException.class, () -> AbstractConfig
+                .checkMultiExtension(Greeting.class, "hello", "default,-world"));
     }
 
     @Test
@@ -203,7 +210,8 @@ public class AbstractConfigTest {
 
     @Test
     public void checkName() throws Exception {
-        Assertions.assertThrows(IllegalStateException.class, () -> AbstractConfig.checkName("hello", "world%"));
+        Assertions.assertThrows(IllegalStateException.class,
+                () -> AbstractConfig.checkName("hello", "world%"));
     }
 
     @Test
@@ -356,7 +364,7 @@ public class AbstractConfigTest {
     }
 
     @Test
-    public void testRefreshProperties() throws Exception{
+    public void testRefreshProperties() throws Exception {
         try {
             Environment.getInstance().setExternalConfigMap(new HashMap<>());
             OverrideConfig overrideConfig = new OverrideConfig();
@@ -370,7 +378,8 @@ public class AbstractConfigTest {
 
             overrideConfig.refresh();
 
-            Assertions.assertEquals("override-config://127.0.0.1:2181", overrideConfig.getAddress());
+            Assertions
+                    .assertEquals("override-config://127.0.0.1:2181", overrideConfig.getAddress());
             Assertions.assertEquals("override-config", overrideConfig.getProtocol());
             Assertions.assertEquals("override-config://", overrideConfig.getEscape());
             //Assertions.assertEquals("properties", overrideConfig.getUseKeyAsProperty());
@@ -425,7 +434,8 @@ public class AbstractConfigTest {
             overrideConfig.setExclude("override-config");
 
             Map<String, String> external = new HashMap<>();
-            external.put("dubbo.override.override-id.address", "external-override-id://127.0.0.1:2181");
+            external.put("dubbo.override.override-id.address",
+                    "external-override-id://127.0.0.1:2181");
             external.put("dubbo.override.address", "external://127.0.0.1:2181");
             // @Parameter(exclude=true)
             external.put("dubbo.override.exclude", "external");
@@ -440,7 +450,8 @@ public class AbstractConfigTest {
             // Load configuration from  system properties -> externalConfiguration -> RegistryConfig -> dubbo.properties
             overrideConfig.refresh();
 
-            Assertions.assertEquals("external-override-id://127.0.0.1:2181", overrideConfig.getAddress());
+            Assertions.assertEquals("external-override-id://127.0.0.1:2181",
+                    overrideConfig.getAddress());
             Assertions.assertEquals("override-config", overrideConfig.getProtocol());
             Assertions.assertEquals("override-config://", overrideConfig.getEscape());
             Assertions.assertEquals("external", overrideConfig.getKey());
@@ -522,12 +533,14 @@ public class AbstractConfigTest {
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.ANNOTATION_TYPE})
     public @interface ConfigField {
+
         String value() default "";
     }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.METHOD, ElementType.ANNOTATION_TYPE})
     public @interface Config {
+
         Class<?> interfaceClass() default void.class;
 
         String interfaceName() default "";
@@ -544,6 +557,7 @@ public class AbstractConfigTest {
     }
 
     private static class OverrideConfig extends AbstractInterfaceConfig {
+
         public String address;
         public String protocol;
         public String exclude;
@@ -623,6 +637,7 @@ public class AbstractConfigTest {
     }
 
     private static class PropertiesConfig extends AbstractConfig {
+
         private char c;
         private boolean bool;
         private byte b;
@@ -714,10 +729,12 @@ public class AbstractConfigTest {
     }
 
     private static class ParameterConfig {
+
         private int number;
         private String name;
         private int age;
         private String secret;
+        private String tt;
 
         ParameterConfig() {
         }
@@ -732,6 +749,10 @@ public class AbstractConfigTest {
         @Parameter(key = "num", append = true)
         public int getNumber() {
             return number;
+        }
+
+        public String getIncomeRatioTestApplication() {
+            return tt;
         }
 
         public void setNumber(int number) {
@@ -773,6 +794,7 @@ public class AbstractConfigTest {
     }
 
     private static class AttributeConfig {
+
         private char letter;
         private boolean activate;
         private byte flag;
@@ -811,6 +833,7 @@ public class AbstractConfigTest {
     }
 
     private static class AnnotationConfig extends AbstractConfig {
+
         private Class interfaceClass;
         private String filter;
         private String listener;
@@ -865,9 +888,11 @@ public class AbstractConfigTest {
             theEnvironmentField.setAccessible(true);
             Map<String, String> env = (Map<String, String>) theEnvironmentField.get(null);
             env.putAll(newenv);
-            Field theCaseInsensitiveEnvironmentField = processEnvironmentClass.getDeclaredField("theCaseInsensitiveEnvironment");
+            Field theCaseInsensitiveEnvironmentField = processEnvironmentClass
+                    .getDeclaredField("theCaseInsensitiveEnvironment");
             theCaseInsensitiveEnvironmentField.setAccessible(true);
-            Map<String, String> cienv = (Map<String, String>) theCaseInsensitiveEnvironmentField.get(null);
+            Map<String, String> cienv = (Map<String, String>) theCaseInsensitiveEnvironmentField
+                    .get(null);
             cienv.putAll(newenv);
         } catch (NoSuchFieldException e) {
             Class[] classes = Collections.class.getDeclaredClasses();
